@@ -1,0 +1,43 @@
+{
+  "brand": "مطعم أوآسيس",
+  "title": "قائمة العملاء",
+  "subtitle": "اختر المفضلات لديك، وأنشئ طلبك، واستمتع بتجربة سلسة.",
+  "searchPlaceholder": "ابحث عن الأطباق أو المكونات أو الفئات",
+  "logoAlt": "شعار المطعم",
+  "loading": "يتم تحميل القائمة...",
+  "items": "عنصر",
+  "addToCart": "أضف إلى السلة",
+  "emptyCart": "يرجى إضافة عنصر واحد على الأقل إلى السلة.",
+  "connectionError": "لم يتم تكوين Supabase بعد. أضف رابط المشروع والمفتاح المجهول للمتابعة.",
+  "loadError": "تعذر تحميل القائمة. يرجى التحقق من جدول Supabase والصلاحيات.",
+  "orderSuccess": "تم تقديم الطلب بنجاح.",
+  "orderError": "تعذر تقديم الطلب. يرجى المحاولة مرة أخرى.",
+  "noResults": "لا توجد أطباق تطابق بحثك الآن.",
+  "languageOptions": {
+    "en": "English",
+    "fr": "Français",
+    "ar": "العربية"
+  },
+  "categoryLabels": {
+    "plats": "الأطباق الرئيسية",
+    "salades": "السلطات",
+    "boissons": "المشروبات",
+    "desserts": "الحلويات"
+  },
+  "itemLabels": {
+    "mushroom pasta": "باستا بالفطر",
+    "grilled chicken": "دجاج مشوي",
+    "classic salad": "سلطة كلاسيكية",
+    "fresh lemonade": "ليموناضة طازجة",
+    "mint tea": "شاي بالنعناع",
+    "moroccan couscous": "كسكس مغربي"
+  },
+  "itemDescriptions": {
+    "mushroom pasta": "باستا كريمية بالفطر المشوي والأعشاب",
+    "grilled chicken": "دجاج طري يقدم مع الخضروات الموسمية",
+    "classic salad": "مزيج طازج من الخضار والطماطم والزيتون",
+    "fresh lemonade": "ليموناضة منعشة بالليمون والنعناع",
+    "mint tea": "شاي بالنعناع التقليدي يقدم ساخنا",
+    "moroccan couscous": "كسكس يدوي مع الخضار والتوابل"
+  }
+}

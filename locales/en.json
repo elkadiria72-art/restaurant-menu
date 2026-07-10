@@ -1,0 +1,43 @@
+{
+  "brand": "Ouasis Restaurant",
+  "title": "Customer Menu",
+  "subtitle": "Choose your favorites, build your order, and enjoy a smooth experience.",
+  "searchPlaceholder": "Search dishes, ingredients, or categories",
+  "logoAlt": "Restaurant logo",
+  "loading": "Loading the menu...",
+  "items": "items",
+  "addToCart": "Add to Cart",
+  "emptyCart": "Please add at least one item to your cart.",
+  "connectionError": "Supabase is not configured yet. Add your project URL and anon key to continue.",
+  "loadError": "The menu could not be loaded. Please verify your Supabase table and permissions.",
+  "orderSuccess": "Your order has been submitted successfully.",
+  "orderError": "We could not place your order. Please try again.",
+  "noResults": "No dishes match your search right now.",
+  "languageOptions": {
+    "en": "English",
+    "fr": "Français",
+    "ar": "العربية"
+  },
+  "categoryLabels": {
+    "plats": "Main Dishes",
+    "salades": "Salads",
+    "boissons": "Drinks",
+    "desserts": "Desserts"
+  },
+  "itemLabels": {
+    "mushroom pasta": "Mushroom Pasta",
+    "grilled chicken": "Grilled Chicken",
+    "classic salad": "Classic Salad",
+    "fresh lemonade": "Fresh Lemonade",
+    "mint tea": "Mint Tea",
+    "moroccan couscous": "Moroccan Couscous"
+  },
+  "itemDescriptions": {
+    "mushroom pasta": "Creamy pasta with roasted mushrooms and herbs",
+    "grilled chicken": "Tender chicken served with seasonal vegetables",
+    "classic salad": "A fresh mix of greens, tomato and olives",
+    "fresh lemonade": "Refreshing citrus lemonade with mint",
+    "mint tea": "Traditional mint tea served hot",
+    "moroccan couscous": "Artisanal couscous with vegetables and spices"
+  }
+}

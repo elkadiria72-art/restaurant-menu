@@ -1,0 +1,43 @@
+{
+  "brand": "Restaurant Ouasis",
+  "title": "Menu Client",
+  "subtitle": "Choisissez vos favoris, composez votre commande et profitez d'une expérience fluide.",
+  "searchPlaceholder": "Rechercher des plats, ingrédients ou catégories",
+  "logoAlt": "Logo du restaurant",
+  "loading": "Chargement du menu...",
+  "items": "articles",
+  "addToCart": "Ajouter au panier",
+  "emptyCart": "Veuillez ajouter au moins un article à votre panier.",
+  "connectionError": "Supabase n'est pas encore configuré. Ajoutez votre URL de projet et votre clé anonyme pour continuer.",
+  "loadError": "Le menu n'a pas pu être chargé. Vérifiez votre table Supabase et les autorisations.",
+  "orderSuccess": "Votre commande a été soumise avec succès.",
+  "orderError": "Nous n'avons pas pu passer votre commande. Veuillez réessayer.",
+  "noResults": "Aucun plat ne correspond à votre recherche pour le moment.",
+  "languageOptions": {
+    "en": "English",
+    "fr": "Français",
+    "ar": "العربية"
+  },
+  "categoryLabels": {
+    "plats": "Plats",
+    "salades": "Salades",
+    "boissons": "Boissons",
+    "desserts": "Desserts"
+  },
+  "itemLabels": {
+    "mushroom pasta": "Pâtes aux champignons",
+    "grilled chicken": "Poulet grillé",
+    "classic salad": "Salade classique",
+    "fresh lemonade": "Limonade fraîche",
+    "mint tea": "Thé à la menthe",
+    "moroccan couscous": "Couscous marocain"
+  },
+  "itemDescriptions": {
+    "mushroom pasta": "Pâtes crémeuses aux champignons rôtis et aux herbes",
+    "grilled chicken": "Poulet tendre servi avec des légumes de saison",
+    "classic salad": "Un mélange frais de verdure, tomate et olives",
+    "fresh lemonade": "Limonade citronnée rafraîchissante à la menthe",
+    "mint tea": "Thé à la menthe traditionnel servi chaud",
+    "moroccan couscous": "Couscous artisanal aux légumes et épices"
+  }
+}
