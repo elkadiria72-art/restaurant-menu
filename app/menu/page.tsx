@@ -100,7 +100,11 @@ export default function MenuPage() {
         return;
       }
 
-      const { data, error } = await supabase.from('menu_items').select('*').order('category', { ascending: true });
+      const { data, error } = await supabase
+        .from('menu_items')
+        .select('*')
+        .eq('is_available', true)
+        .order('category', { ascending: true });
 
       if (!error && data) {
         setMenuItems(data as MenuItem[]);
