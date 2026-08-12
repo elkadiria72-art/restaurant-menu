@@ -13,6 +13,13 @@
   "orderSuccess": "تم تقديم الطلب بنجاح.",
   "orderError": "تعذر تقديم الطلب. يرجى المحاولة مرة أخرى.",
   "noResults": "لا توجد أطباق تطابق بحثك الآن.",
+  "callWaiter": "استدعاء النادل",
+  "requestBill": "طلب الحساب",
+  "requestHelp": "مساعدة",
+  "callSent": "تم إرسال الطلب، النادل في الطريق",
+  "callError": "تعذر إرسال الطلب. حاول مرة أخرى.",
+  "cancel": "إلغاء",
+  "chooseRequest": "اختر نوع الطلب",
   "languageOptions": {
     "en": "English",
     "fr": "Français",

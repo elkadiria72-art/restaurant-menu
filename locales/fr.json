@@ -13,6 +13,13 @@
   "orderSuccess": "Votre commande a été soumise avec succès.",
   "orderError": "Nous n'avons pas pu passer votre commande. Veuillez réessayer.",
   "noResults": "Aucun plat ne correspond à votre recherche pour le moment.",
+  "callWaiter": "Appeler le serveur",
+  "requestBill": "Demander l'addition",
+  "requestHelp": "Demander de l'aide",
+  "callSent": "Votre demande a été envoyée, le serveur arrive.",
+  "callError": "Impossible d'envoyer la demande. Veuillez réessayer.",
+  "cancel": "Annuler",
+  "chooseRequest": "Choisissez le type de demande",
   "languageOptions": {
     "en": "English",
     "fr": "Français",

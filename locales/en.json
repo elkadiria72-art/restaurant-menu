@@ -13,6 +13,13 @@
   "orderSuccess": "Your order has been submitted successfully.",
   "orderError": "We could not place your order. Please try again.",
   "noResults": "No dishes match your search right now.",
+  "callWaiter": "Call Waiter",
+  "requestBill": "Request Bill",
+  "requestHelp": "Request Help",
+  "callSent": "Your request has been sent, the waiter is on the way.",
+  "callError": "Could not send request. Please try again.",
+  "cancel": "Cancel",
+  "chooseRequest": "Choose request type",
   "languageOptions": {
     "en": "English",
     "fr": "Français",

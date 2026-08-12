@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ChevronUp, Plus, Search, Sparkles, X } from 'lucide-react';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase';
+import { translateTextClient } from '@/lib/translateClient';
 import Cart from './components/Cart';
 
 import en from '@/locales/en.json';
@@ -52,6 +53,12 @@ export default function MenuPage() {
   const [waiterModalOpen, setWaiterModalOpen] = useState(false);
   const [waiterToast, setWaiterToast] = useState('');
   const [submittingWaiterCall, setSubmittingWaiterCall] = useState(false);
+  const [tableId, setTableId] = useState<number | null>(null);
+  const [tableNumber, setTableNumber] = useState<number | null>(null);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
+  const [openSearch, setOpenSearch] = useState(false);
+  const [translationsCache, setTranslationsCache] = useState<Record<string, string>>({});
 
   const t = translations[language];
   const isRTL = language === 'ar';
@@ -59,20 +66,54 @@ export default function MenuPage() {
   const cartItemsCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  const translateCategory = (value: string) => {
+  // builtin translation dictionary (normalized keys)
+  const translationsDict: Record<string, Record<Language, string>> = {
+    // categories
+    'الطواجن': { en: 'Tagines', fr: 'Tajines', ar: 'الطواجن' },
+    'المشروبات': { en: 'Drinks', fr: 'Boissons', ar: 'المشروبات' },
+    'المقبلات': { en: 'Appetizers', fr: 'Entrées', ar: 'المقبلات' },
+    'التحليات': { en: 'Desserts', fr: 'Desserts', ar: 'التحليات' },
+    'السلطات': { en: 'Salads', fr: 'Salades', ar: 'السلطات' },
+    'الأطباق الرئيسية': { en: 'Main Dishes', fr: 'Plats', ar: 'الأطباق الرئيسية' },
+    'boissons': { en: 'Drinks', fr: 'Boissons', ar: 'المشروبات' },
+    'plats': { en: 'Main Dishes', fr: 'Plats', ar: 'الأطباق الرئيسية' },
+    'salades': { en: 'Salads', fr: 'Salades', ar: 'السلطات' },
+    // common items
+    'mushroom pasta': { en: 'Mushroom Pasta', fr: 'Pâtes aux champignons', ar: 'باستا بالفطر' },
+    'grilled chicken': { en: 'Grilled Chicken', fr: 'Poulet grillé', ar: 'دجاج مشوي' },
+    'classic salad': { en: 'Classic Salad', fr: 'Salade classique', ar: 'سلطة كلاسيكية' },
+    'fresh lemonade': { en: 'Fresh Lemonade', fr: 'Limonade fraîche', ar: 'ليموناضة طازجة' },
+    'mint tea': { en: 'Mint Tea', fr: 'Thé à la menthe', ar: 'شاي بالنعناع' },
+    'moroccan couscous': { en: 'Moroccan Couscous', fr: 'Couscous marocain', ar: 'كسكس مغربي' },
+  };
+
+  const translateText = (text: string | undefined, target: Language) => {
+    if (!text) return '';
+    const key = normalize(text || '');
+    const cacheKey = `${text}:::${target}`;
+    if (translationsCache[cacheKey]) return translationsCache[cacheKey];
+    // prefer explicit locale bundles first
     const categoryLabels = (t as LocaleBundle & { categoryLabels?: Record<string, string> }).categoryLabels ?? {};
-    return categoryLabels[normalize(value)] || value;
-  };
-
-  const translateItemName = (item: MenuItem) => {
     const itemLabels = (t as LocaleBundle & { itemLabels?: Record<string, string> }).itemLabels ?? {};
-    return itemLabels[normalize(item.name)] || item.name;
+    const itemDescriptions = (t as LocaleBundle & { itemDescriptions?: Record<string, string> }).itemDescriptions ?? {};
+
+    if (itemLabels[key]) return itemLabels[key];
+    if (itemDescriptions[key]) return itemDescriptions[key];
+    if (categoryLabels[key]) return categoryLabels[key];
+
+    if (translationsDict[key] && translationsDict[key][target]) return translationsDict[key][target];
+
+    // fallback: if text looks like already in target language, return it; otherwise return original (no external calls)
+    return text;
   };
 
-  const translateItemDescription = (item: MenuItem) => {
-    const itemDescriptions = (t as LocaleBundle & { itemDescriptions?: Record<string, string> }).itemDescriptions ?? {};
-    return itemDescriptions[normalize(item.name)] || item.description;
+  const translateCategory = (value: string) => {
+    return translateText(value, language);
   };
+
+  const translateItemName = (item: MenuItem) => translateText(item.name, language);
+
+  const translateItemDescription = (item: MenuItem) => translateText(item.description || item.name, language);
 
   useEffect(() => {
     document.body.style.overflow = cartOpen || waiterModalOpen ? 'hidden' : 'auto';
@@ -114,21 +155,131 @@ export default function MenuPage() {
       }
       setLoading(false);
     };
+    // read validated table info from localStorage if present
+    try {
+      const raw = typeof window !== 'undefined' ? localStorage.getItem('elk_table') : null;
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed?.table_id) setTableId(parsed.table_id);
+        if (parsed?.table_number) setTableNumber(parsed.table_number);
+      }
+    } catch (e) {
+      // ignore
+    }
 
     loadMenu();
   }, [language, t.connectionError, t.loadError]);
 
-  const filteredItems = useMemo(() => {
-    if (!searchQueryNormalized) return menuItems;
+  useEffect(() => {
+    // fetch server-driven categories
+    const loadCategories = async () => {
+      try {
+        const res = await fetch('/api/categories');
+        if (!res.ok) return;
+        const cats = await res.json();
+        setCategories((cats || []).filter(Boolean));
+      } catch (e) {
+        // ignore
+      }
+    };
 
-    return menuItems.filter((item) => {
+    loadCategories();
+  }, []);
+
+  useEffect(() => {
+    // fallback: derive categories from menuItems if API returned none
+    if ((!categories || categories.length === 0) && menuItems && menuItems.length) {
+      const cats = Array.from(new Set(menuItems.map((m) => m.category).filter(Boolean)));
+      setCategories(cats);
+    }
+  }, [menuItems, categories]);
+
+  // prefetch translations for visible texts when language changes
+  useEffect(() => {
+    let mounted = true;
+
+    const fetchTranslations = async () => {
+      const toTranslate = new Set<string>();
+
+      const categoryLabels = (t as LocaleBundle & { categoryLabels?: Record<string, string> }).categoryLabels ?? {};
+      const itemLabels = (t as LocaleBundle & { itemLabels?: Record<string, string> }).itemLabels ?? {};
+      const itemDescriptions = (t as LocaleBundle & { itemDescriptions?: Record<string, string> }).itemDescriptions ?? {};
+
+      // gather categories
+      categories.forEach((c) => {
+        if (!c) return;
+        const key = normalize(c);
+        const cacheKey = `${c}:::${language}`;
+        if (translationsCache[cacheKey]) return;
+        if (categoryLabels[key]) return;
+        if (translationsDict[key] && translationsDict[key][language]) return;
+        toTranslate.add(c);
+      });
+
+      // gather item names and descriptions
+      menuItems.forEach((it) => {
+        if (it.name) {
+          const cacheKey = `${it.name}:::${language}`;
+          const key = normalize(it.name);
+          if (!translationsCache[cacheKey] && !itemLabels[key] && !(translationsDict[key] && translationsDict[key][language])) {
+            toTranslate.add(it.name);
+          }
+        }
+        const desc = it.description || it.name;
+        if (desc) {
+          const cacheKey = `${desc}:::${language}`;
+          const key = normalize(desc);
+          if (!translationsCache[cacheKey] && !itemDescriptions[key] && !(translationsDict[key] && translationsDict[key][language])) {
+            toTranslate.add(desc);
+          }
+        }
+      });
+
+      for (const text of Array.from(toTranslate)) {
+        try {
+          const translated = await translateTextClient(text, language);
+          if (!mounted) return;
+          setTranslationsCache((prev) => ({ ...prev, [`${text}:::${language}`]: translated }));
+        } catch (e) {
+          // ignore per-item failures
+        }
+      }
+    };
+
+    fetchTranslations();
+
+    return () => {
+      mounted = false;
+    };
+  }, [language, menuItems, categories]);
+
+  useEffect(() => {
+    // reset selected category when categories change
+    if (categories.length === 0) {
+      setSelectedCategory('ALL');
+    }
+  }, [categories.length]);
+
+  // no async translation listeners required with built-in dictionary
+
+  const filteredItems = useMemo(() => {
+    let items = menuItems.slice();
+
+    // category filter
+    if (selectedCategory && selectedCategory !== 'ALL') {
+      items = items.filter((it) => normalize(it.category) === normalize(selectedCategory));
+    }
+
+    if (!searchQueryNormalized) return items;
+
+    return items.filter((item) => {
       const translatedName = translateItemName(item);
       const translatedDescription = translateItemDescription(item);
       const translatedCategory = translateCategory(item.category);
 
       return [translatedName, translatedDescription, translatedCategory].some((value) => normalize(value).includes(searchQueryNormalized));
     });
-  }, [menuItems, searchQueryNormalized, language]);
+  }, [menuItems, searchQueryNormalized, language, selectedCategory]);
 
   const groupedItems = useMemo(() => {
     return filteredItems.reduce<Record<string, MenuItem[]>>((acc, item) => {
@@ -182,12 +333,16 @@ export default function MenuPage() {
       name: item.name,
     }));
 
-    const { error } = await supabase.from('orders').insert({
+    const payload: any = {
       items: itemsPayload,
       total_price: totalPrice,
-      table_number: 1,
+      table_number: tableNumber ?? 1,
       status: 'pending',
-    });
+    };
+
+    if (tableId) payload.table_id = tableId;
+
+    const { error } = await supabase.from('orders').insert(payload);
 
     if (error) {
       setMessage(t.orderError);
@@ -205,88 +360,142 @@ export default function MenuPage() {
     setWaiterToast('');
 
     if (!isSupabaseConfigured || !supabase) {
-      setWaiterToast('تعذر إرسال الطلب. تحقق من إعدادات Supabase.');
+      setWaiterToast(t.callError);
       setSubmittingWaiterCall(false);
       setWaiterModalOpen(false);
       return;
     }
+    const messageMap: Record<string, string> = {
+      bill: 'طلب الحساب',
+      help: 'استدعاء النادل',
+    };
 
-    const { error } = await supabase.from('waiter_calls').insert({
-      request_type: requestType,
-      table_number: 1,
+    const waiterPayload: any = {
+      table_number: tableNumber ?? 1,
+      message: messageMap[requestType] || 'استدعاء النادل',
       status: 'pending',
-    });
+    };
 
-    setSubmittingWaiterCall(false);
-    setWaiterModalOpen(false);
+    if (tableId) waiterPayload.table_id = tableId;
 
-    if (error) {
-      setWaiterToast('تعذر إرسال الطلب. حاول مرة أخرى.');
-    } else {
-      setWaiterToast('تم إرسال الطلب، النادل في الطريق');
+    try {
+      const { error } = await supabase.from('waiter_calls').insert(waiterPayload);
+      if (error) {
+        console.error('waiter_calls insert error', error);
+        setWaiterToast(t.callError);
+      } else {
+        setWaiterToast(t.callSent);
+      }
+    } catch (err) {
+      console.error('waiter call failed', err);
+      setWaiterToast(t.callError);
+    } finally {
+      setSubmittingWaiterCall(false);
+      setWaiterModalOpen(false);
     }
   };
 
   return (
     <main className={`min-h-screen overflow-x-hidden bg-[linear-gradient(135deg,_#f4ebdc_0%,_#fffaf2_42%,_#efe0c0_100%)] ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+      {/* Mobile sticky categories and collapsible search */}
+      <div className="sticky top-0 z-40 bg-gradient-to-b from-[#fffaf3] via-[#fffaf3] to-transparent/0 px-3 pt-3 pb-2">
+        <div className="mx-auto max-w-7xl flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <button
+              aria-label={t.searchPlaceholder}
+              onClick={() => setOpenSearch((s) => !s)}
+              className="rounded-full bg-white/90 p-2 shadow-sm"
+            >
+              <Search size={18} className="text-[#2f2417]" />
+            </button>
+          </div>
+          <div className="flex-1" />
+        </div>
+
+        {openSearch ? (
+          <div className="mt-3 px-3">
+            <label className="flex items-center gap-2 rounded-full border border-[#b08b4d]/30 bg-white px-3 py-2 shadow-sm">
+              <Search size={18} className="text-[#9a6c29]" />
+              <input
+                autoFocus
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={t.searchPlaceholder}
+                className="w-full bg-transparent text-sm text-[#2f2417] outline-none placeholder:text-[#9d8b6a]"
+              />
+              <button type="button" onClick={() => { setOpenSearch(false); setSearchQuery(''); }} className="text-sm text-[#7a6140]">{t.cancel}</button>
+            </label>
+          </div>
+        ) : null}
+
+        <div className="mt-3 -mx-3 overflow-x-auto px-3 pb-2">
+          <div className="flex gap-3 flex-row">
+            {/* All button: always rendered first on the left */}
+            <button
+              onClick={() => setSelectedCategory('ALL')}
+              className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium ${selectedCategory === 'ALL' ? 'bg-[#C9A227] text-[#22170e] shadow-sm' : 'bg-white/90 text-[#5b4325] border border-[#e9dfbf]'}`}
+            >
+              {language === 'ar' ? 'الكل' : language === 'fr' ? 'Tous' : 'All'}
+            </button>
+
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium ${selectedCategory === cat ? 'bg-[#C9A227] text-[#22170e] shadow-sm' : 'bg-white/90 text-[#5b4325] border border-[#e9dfbf]'}`}
+              >
+                {translateCategory(cat)}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
       <div className="mx-auto flex max-w-7xl flex-col gap-4 p-3 pb-28 sm:gap-6 sm:p-6 lg:grid lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-8 lg:p-8 lg:pb-8">
         <section className="relative overflow-hidden rounded-[34px] border border-[#b08b4d]/30 bg-[#fcf7ef]/95 p-3 shadow-[0_30px_90px_-35px_rgba(101,70,27,0.45)] backdrop-blur-sm sm:p-4">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(176,139,77,0.16),_transparent_36%),linear-gradient(135deg,_rgba(93,107,77,0.06),_transparent_45%)]" />
           <div className="relative space-y-4 sm:space-y-5">
-            <div className="sticky top-0 z-20 -mx-1 rounded-[28px] border border-[#b08b4d]/35 bg-[linear-gradient(135deg,_#fdf8ee_0%,_#f2e3c8_100%)] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] backdrop-blur sm:p-4">
-              <div className="absolute inset-x-5 top-0 h-px bg-gradient-to-r from-transparent via-[#b08b4d]/70 to-transparent" />
-              <div className="absolute inset-x-5 bottom-0 h-px bg-gradient-to-r from-transparent via-[#5d6b4d]/50 to-transparent" />
-              <div className="flex flex-col gap-3">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex min-w-0 items-center gap-3">
-                    <div className="rounded-[20px] border border-[#b08b4d]/35 bg-[#fffaf3] p-2 shadow-inner">
-                      <img
-                        src="https://placehold.co/96x96?text=Logo"
-                        alt={t.logoAlt}
-                        loading="lazy"
-                        decoding="async"
-                        className="h-12 w-12 rounded-[16px] object-cover sm:h-14 sm:w-14"
-                      />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#9a6c29] sm:text-xs">
-                        <Sparkles size={14} />
-                        {t.brand}
-                      </div>
-                      <h1 className="truncate text-lg font-semibold text-[#2f2417] sm:text-xl">{t.title}</h1>
-                    </div>
+            <div className="sticky top-0 z-20 -mx-1 rounded-[28px] border border-transparent bg-transparent p-0">
+              <div className="flex items-center justify-between gap-3 px-2">
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="rounded-[14px] bg-transparent p-0">
+                    <img
+                      src="https://placehold.co/96x96?text=Logo"
+                      alt={t.logoAlt}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-10 w-10 rounded-[12px] object-cover sm:h-12 sm:w-12"
+                    />
                   </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#2f8f4a] sm:text-xs">
+                      <Sparkles size={14} />
+                      {t.brand}
+                    </div>
+                    <h1 className="truncate text-lg font-semibold text-[#2f2417] sm:text-xl">{t.title}</h1>
+                  </div>
+                </div>
 
-                  <div className="flex flex-wrap items-center justify-end gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setWaiterModalOpen(true)}
-                      className="min-h-11 rounded-full border border-[#b08b4d]/35 bg-[#2f2417] px-3 py-2 text-sm font-semibold text-[#fff7e8] transition duration-300 touch-manipulation hover:-translate-y-0.5 hover:bg-[#4a3723]"
-                    >
-                      استدعاء النادل
-                    </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setWaiterModalOpen(true)}
+                    className="min-h-9 rounded-full bg-[#2f8f4a] px-3 py-2 text-sm font-semibold text-white transition duration-200 hover:scale-105"
+                  >
+                    {t.callWaiter}
+                  </button>
+                  <div className="flex gap-2">
                     {(['en', 'fr', 'ar'] as Language[]).map((code) => (
                       <button
                         key={code}
                         type="button"
                         onClick={() => setLanguage(code)}
-                        className={`min-h-11 flex-1 rounded-full border px-3 py-2 text-sm font-medium transition duration-300 touch-manipulation ${language === code ? 'border-[#8b5e2b] bg-[#8b5e2b] text-[#fff7e8] shadow-[0_10px_30px_-12px_rgba(139,94,43,0.7)]' : 'border-[#b08b4d]/35 bg-[#fffaf3] text-[#5b4325] hover:-translate-y-0.5 hover:border-[#8b5e2b] hover:bg-[#f5e4c4]'}`}
+                        className={`min-h-9 flex items-center justify-center rounded-full px-3 py-2 text-sm font-medium transition duration-200 ${language === code ? 'bg-[#2f8f4a] text-white' : 'bg-white/90 text-[#2f2417] border'}`}
                       >
                         {t.languageOptions[code]}
                       </button>
                     ))}
                   </div>
                 </div>
-
-                <label className="flex items-center gap-2 rounded-full border border-[#b08b4d]/40 bg-[#fffaf3] px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
-                  <Search size={18} className="text-[#9a6c29]" />
-                  <input
-                    value={searchQuery}
-                    onChange={(event) => setSearchQuery(event.target.value)}
-                    placeholder={t.searchPlaceholder}
-                    className="w-full bg-transparent text-sm text-[#2f2417] outline-none placeholder:text-[#9d8b6a]"
-                  />
-                </label>
               </div>
             </div>
 
@@ -371,6 +580,15 @@ export default function MenuPage() {
         </div>
       ) : null}
 
+      {/* Floating sticky search icon (mobile) */}
+      <button
+        aria-label={t.searchPlaceholder}
+        onClick={() => setOpenSearch((s) => !s)}
+        className="lg:hidden fixed right-4 bottom-24 z-50 rounded-full bg-[#C9A227] p-3 shadow-lg text-[#22170e]"
+      >
+        <Search size={20} />
+      </button>
+
       <button
         type="button"
         onClick={() => setCartOpen(true)}
@@ -393,8 +611,8 @@ export default function MenuPage() {
           <div className="w-full max-w-md rounded-[28px] border border-[#b08b4d]/30 bg-[#fcf7ef] p-5 shadow-[0_30px_90px_-30px_rgba(25,17,10,0.8)]">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-lg font-semibold text-[#2f2417]">استدعاء النادل</p>
-                <p className="mt-1 text-sm text-[#7a6140]">اختر نوع الطلب</p>
+                <p className="text-lg font-semibold text-[#2f2417]">{t.callWaiter}</p>
+                <p className="mt-1 text-sm text-[#7a6140]">{t.chooseRequest}</p>
               </div>
               <button type="button" onClick={() => setWaiterModalOpen(false)} className="rounded-full border border-[#b08b4d]/20 bg-white p-2 text-[#5b4325]">
                 <X size={16} />
@@ -408,7 +626,7 @@ export default function MenuPage() {
                 disabled={submittingWaiterCall}
                 className="flex w-full items-center justify-center rounded-full bg-[#2f2417] px-4 py-3 text-sm font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-[#4a3723] disabled:cursor-not-allowed disabled:opacity-70"
               >
-                {submittingWaiterCall ? '...' : 'طلب الحساب'}
+                {submittingWaiterCall ? '...' : t.requestBill}
               </button>
               <button
                 type="button"
@@ -416,7 +634,7 @@ export default function MenuPage() {
                 disabled={submittingWaiterCall}
                 className="flex w-full items-center justify-center rounded-full border border-[#b08b4d]/30 bg-[#fffaf3] px-4 py-3 text-sm font-semibold text-[#5b4325] transition duration-300 hover:-translate-y-0.5 hover:bg-[#f5e4c4] disabled:cursor-not-allowed disabled:opacity-70"
               >
-                {submittingWaiterCall ? '...' : 'مساعدة'}
+                {submittingWaiterCall ? '...' : t.requestHelp}
               </button>
             </div>
           </div>
