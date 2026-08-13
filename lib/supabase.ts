@@ -8,5 +8,6 @@ export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 export const supabase = isSupabaseConfigured
   ? createClient(supabaseUrl as string, supabaseAnonKey as string, {
       auth: { persistSession: false },
+      realtime: { params: { eventsPerSecond: 10 } },
     })
   : null;

@@ -1,5 +1,6 @@
-import ClientSetup from './client-setup';
-import { supabase } from '@/lib/supabase';
+import { redirect } from 'next/navigation';
+import InvalidToken from '@/app/menu/InvalidToken';
+import { isTableBlocked, normalizeQrToken, validateTableToken } from '@/lib/validateTable';
 
 type Props = {
   params: {
@@ -7,25 +8,22 @@ type Props = {
   };
 };
 
-export default async function Page({ params }: Props) {
-  const token = params.token;
+export default async function TokenRedirectPage({ params }: Props) {
+  const token = normalizeQrToken(params.token);
 
-  if (!supabase) {
-    return <div className="p-6">Supabase is not configured.</div>;
+  if (!token) {
+    return <InvalidToken reason="missing" />;
   }
 
-  const { data, error } = await supabase.from('tables').select('id,table_number').eq('qr_token', token).limit(1).maybeSingle();
+  const table = await validateTableToken(token);
 
-  if (error || !data) {
-    return (
-      <div className="min-h-screen p-6">
-        <div className="mx-auto max-w-2xl rounded-2xl border border-[#b08b4d]/20 bg-[#fffaf3] p-6 text-center">
-          <h1 className="mb-3 text-xl font-semibold text-[#2f2417]">رمز الطاولة غير صالح</h1>
-          <p className="text-sm text-[#6f5b3a]">الرجاء التحقق من رمز QR أو طلب المساعدة من النادل.</p>
-        </div>
-      </div>
-    );
+  if (!table) {
+    return <InvalidToken reason="invalid" />;
   }
 
-  return <ClientSetup tableId={data.id} tableNumber={data.table_number} qrToken={token} />;
+  if (isTableBlocked(table.status)) {
+    return <InvalidToken reason="inactive" />;
+  }
+
+  redirect(`/menu?token=${encodeURIComponent(table.qr_token)}`);
 }

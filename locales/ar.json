@@ -13,6 +13,8 @@
   "orderSuccess": "تم تقديم الطلب بنجاح.",
   "orderError": "تعذر تقديم الطلب. يرجى المحاولة مرة أخرى.",
   "noResults": "لا توجد أطباق تطابق بحثك الآن.",
+  "allCategory": "الكل",
+  "viewCart": "عرض السلة",
   "callWaiter": "استدعاء النادل",
   "requestBill": "طلب الحساب",
   "requestHelp": "مساعدة",
@@ -20,31 +22,11 @@
   "callError": "تعذر إرسال الطلب. حاول مرة أخرى.",
   "cancel": "إلغاء",
   "chooseRequest": "اختر نوع الطلب",
+  "tableLabel": "طاولة",
+  "tableUnavailable": "هذه الطاولة غير متاحة للطلب حالياً. يرجى التواصل مع النادل.",
   "languageOptions": {
     "en": "English",
     "fr": "Français",
     "ar": "العربية"
-  },
-  "categoryLabels": {
-    "plats": "الأطباق الرئيسية",
-    "salades": "السلطات",
-    "boissons": "المشروبات",
-    "desserts": "الحلويات"
-  },
-  "itemLabels": {
-    "mushroom pasta": "باستا بالفطر",
-    "grilled chicken": "دجاج مشوي",
-    "classic salad": "سلطة كلاسيكية",
-    "fresh lemonade": "ليموناضة طازجة",
-    "mint tea": "شاي بالنعناع",
-    "moroccan couscous": "كسكس مغربي"
-  },
-  "itemDescriptions": {
-    "mushroom pasta": "باستا كريمية بالفطر المشوي والأعشاب",
-    "grilled chicken": "دجاج طري يقدم مع الخضروات الموسمية",
-    "classic salad": "مزيج طازج من الخضار والطماطم والزيتون",
-    "fresh lemonade": "ليموناضة منعشة بالليمون والنعناع",
-    "mint tea": "شاي بالنعناع التقليدي يقدم ساخنا",
-    "moroccan couscous": "كسكس يدوي مع الخضار والتوابل"
   }
 }

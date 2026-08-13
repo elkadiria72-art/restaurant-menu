@@ -13,6 +13,8 @@
   "orderSuccess": "Votre commande a été soumise avec succès.",
   "orderError": "Nous n'avons pas pu passer votre commande. Veuillez réessayer.",
   "noResults": "Aucun plat ne correspond à votre recherche pour le moment.",
+  "allCategory": "Tous",
+  "viewCart": "Voir le panier",
   "callWaiter": "Appeler le serveur",
   "requestBill": "Demander l'addition",
   "requestHelp": "Demander de l'aide",
@@ -20,31 +22,11 @@
   "callError": "Impossible d'envoyer la demande. Veuillez réessayer.",
   "cancel": "Annuler",
   "chooseRequest": "Choisissez le type de demande",
+  "tableLabel": "Table",
+  "tableUnavailable": "Cette table n'est pas disponible pour commander. Contactez le personnel.",
   "languageOptions": {
     "en": "English",
     "fr": "Français",
     "ar": "العربية"
-  },
-  "categoryLabels": {
-    "plats": "Plats",
-    "salades": "Salades",
-    "boissons": "Boissons",
-    "desserts": "Desserts"
-  },
-  "itemLabels": {
-    "mushroom pasta": "Pâtes aux champignons",
-    "grilled chicken": "Poulet grillé",
-    "classic salad": "Salade classique",
-    "fresh lemonade": "Limonade fraîche",
-    "mint tea": "Thé à la menthe",
-    "moroccan couscous": "Couscous marocain"
-  },
-  "itemDescriptions": {
-    "mushroom pasta": "Pâtes crémeuses aux champignons rôtis et aux herbes",
-    "grilled chicken": "Poulet tendre servi avec des légumes de saison",
-    "classic salad": "Un mélange frais de verdure, tomate et olives",
-    "fresh lemonade": "Limonade citronnée rafraîchissante à la menthe",
-    "mint tea": "Thé à la menthe traditionnel servi chaud",
-    "moroccan couscous": "Couscous artisanal aux légumes et épices"
   }
 }

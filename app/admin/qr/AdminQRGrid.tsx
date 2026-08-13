@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-
+import Link from 'next/link';
 type Table = {
   id: number;
   table_number: number;
@@ -10,13 +10,21 @@ type Table = {
 };
 
 export default function AdminQRGrid({ tables }: { tables: Table[] }) {
-  const baseUrl = 'https://menu.elkahmed.com/t/';
+  const baseUrl =
+    process.env.NEXT_PUBLIC_MENU_BASE_URL?.replace(/\/$/, '') ||
+    'https://restaurant-menu-flame-theta.vercel.app/menu?token=';
 
   return (
     <div className="mx-auto max-w-6xl p-6">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-[#2f2417]">قوائم QR للطاولات</h1>
         <div className="flex items-center gap-3">
+          <Link
+            href="/admin/orders"
+            className="rounded-full border border-[#b08b4d]/30 bg-white px-4 py-2 text-sm font-medium text-[#5b4325] shadow-sm"
+          >
+            الطلبات
+          </Link>
           <button
             onClick={() => window.print()}
             className="rounded-full bg-[#d6a24a] px-4 py-2 text-sm font-semibold text-[#22170e] shadow-sm"

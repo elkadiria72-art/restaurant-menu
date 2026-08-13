@@ -13,6 +13,8 @@
   "orderSuccess": "Your order has been submitted successfully.",
   "orderError": "We could not place your order. Please try again.",
   "noResults": "No dishes match your search right now.",
+  "allCategory": "All",
+  "viewCart": "View cart",
   "callWaiter": "Call Waiter",
   "requestBill": "Request Bill",
   "requestHelp": "Request Help",
@@ -20,31 +22,11 @@
   "callError": "Could not send request. Please try again.",
   "cancel": "Cancel",
   "chooseRequest": "Choose request type",
+  "tableLabel": "Table",
+  "tableUnavailable": "This table is currently unavailable for ordering. Please contact staff.",
   "languageOptions": {
     "en": "English",
     "fr": "Français",
     "ar": "العربية"
-  },
-  "categoryLabels": {
-    "plats": "Main Dishes",
-    "salades": "Salads",
-    "boissons": "Drinks",
-    "desserts": "Desserts"
-  },
-  "itemLabels": {
-    "mushroom pasta": "Mushroom Pasta",
-    "grilled chicken": "Grilled Chicken",
-    "classic salad": "Classic Salad",
-    "fresh lemonade": "Fresh Lemonade",
-    "mint tea": "Mint Tea",
-    "moroccan couscous": "Moroccan Couscous"
-  },
-  "itemDescriptions": {
-    "mushroom pasta": "Creamy pasta with roasted mushrooms and herbs",
-    "grilled chicken": "Tender chicken served with seasonal vegetables",
-    "classic salad": "A fresh mix of greens, tomato and olives",
-    "fresh lemonade": "Refreshing citrus lemonade with mint",
-    "mint tea": "Traditional mint tea served hot",
-    "moroccan couscous": "Artisanal couscous with vegetables and spices"
   }
 }
