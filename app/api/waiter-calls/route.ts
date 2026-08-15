@@ -58,7 +58,6 @@ export async function POST(request: Request) {
     .insert({
       table_id: table.table_id,
       table_number: table.table_number,
-      request_type,
       message,
       status: 'pending',
     })

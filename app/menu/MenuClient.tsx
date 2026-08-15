@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import { translateTextClient } from '@/lib/translateClient';
 import { clearTableSession, getTokenFromUrl, redirectToCanonicalMenu, saveTableSession, urlTokenMatchesTable } from '@/lib/tableSession';
@@ -74,6 +74,7 @@ export default function MenuClient({ table }: Props) {
   const [translationsCache, setTranslationsCache] = useState<Record<string, string>>({});
   const [tableStatus, setTableStatus] = useState<string | null>(table.status ?? null);
   const [lastOrderId, setLastOrderId] = useState<number | null>(null);
+  const waiterCallInFlight = useRef(false);
 
   const t = translations[language];
   const isRTL = language === 'ar';
@@ -433,6 +434,8 @@ export default function MenuClient({ table }: Props) {
   };
 
   const handleWaiterCall = async (requestType: WaiterRequestType) => {
+    if (waiterCallInFlight.current) return;
+    waiterCallInFlight.current = true;
     setSubmittingWaiterCall(true);
 
     try {
@@ -466,6 +469,7 @@ export default function MenuClient({ table }: Props) {
       }
       showToast(t.callError, 'error');
     } finally {
+      waiterCallInFlight.current = false;
       setSubmittingWaiterCall(false);
       setWaiterModalOpen(false);
     }
