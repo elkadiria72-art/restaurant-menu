@@ -6,25 +6,25 @@ import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import type { OrderRecord } from '@/lib/types';
 
 const STATUS_LABELS: Record<string, string> = {
-  pending: 'قيد الانتظار',
+  new: 'جديد',
   preparing: 'قيد التحضير',
   ready: 'جاهز',
-  completed: 'مكتمل',
+  served: 'تم التقديم',
   cancelled: 'ملغى',
 };
 
 const STATUS_STYLES: Record<string, string> = {
-  pending: 'bg-amber-100 text-amber-900 border-amber-200',
+  new: 'bg-amber-100 text-amber-900 border-amber-200',
   preparing: 'bg-sky-100 text-sky-900 border-sky-200',
   ready: 'bg-emerald-100 text-emerald-900 border-emerald-200',
-  completed: 'bg-stone-100 text-stone-700 border-stone-200',
+  served: 'bg-stone-100 text-stone-700 border-stone-200',
   cancelled: 'bg-red-100 text-red-900 border-red-200',
 };
 
 const NEXT_ACTIONS: Record<string, { label: string; next: string }[]> = {
-  pending: [{ label: 'بدء التحضير', next: 'preparing' }],
+  new: [{ label: 'بدء التحضير', next: 'preparing' }],
   preparing: [{ label: 'جاهز للتقديم', next: 'ready' }],
-  ready: [{ label: 'تم التقديم', next: 'completed' }],
+  ready: [{ label: 'تم التقديم', next: 'served' }],
 };
 
 type Props = {
@@ -78,7 +78,7 @@ export default function AdminOrdersBoard({ initialOrders }: Props) {
 
   const visibleOrders = useMemo(() => {
     if (filter === 'all') return orders;
-    return orders.filter((order) => order.status !== 'completed' && order.status !== 'cancelled');
+    return orders.filter((order) => order.status !== 'served' && order.status !== 'cancelled');
   }, [orders, filter]);
 
   const updateStatus = async (orderId: number, status: string) => {
@@ -151,14 +151,14 @@ export default function AdminOrdersBoard({ initialOrders }: Props) {
                       <h2 className="text-lg font-semibold text-[#2f2417]">طاولة {order.table_number}</h2>
                       <span className="text-xs text-[#7a6140]">#{order.id}</span>
                       <span
-                        className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${STATUS_STYLES[order.status] ?? STATUS_STYLES.pending}`}
+                        className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${STATUS_STYLES[order.status] ?? STATUS_STYLES.new}`}
                       >
                         {STATUS_LABELS[order.status] ?? order.status}
                       </span>
                     </div>
                     <p className="mt-1 text-xs text-[#7a6140]">{formatTime(order.created_at)}</p>
                   </div>
-                  <p className="text-lg font-semibold text-[#2f2417]">{order.total_price.toFixed(2)} DH</p>
+                  <p className="text-lg font-semibold text-[#2f2417]">{order.total_amount.toFixed(2)} DH</p>
                 </div>
 
                 <ul className="mt-4 space-y-2">
@@ -194,7 +194,7 @@ export default function AdminOrdersBoard({ initialOrders }: Props) {
                       {updatingId === order.id ? '...' : action.label}
                     </button>
                   ))}
-                  {order.status !== 'cancelled' && order.status !== 'completed' ? (
+                  {order.status !== 'cancelled' && order.status !== 'served' ? (
                     <button
                       type="button"
                       disabled={updatingId === order.id}

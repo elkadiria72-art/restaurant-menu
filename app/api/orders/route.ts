@@ -89,10 +89,10 @@ export async function POST(request: Request) {
     .from('orders')
     .insert({
       items: itemsPayload,
-      total_price: totalPrice,
+      total_amount: totalPrice,
       table_id: table.table_id,
       table_number: table.table_number,
-      status: 'pending',
+      status: 'new',
       ...(notes ? { notes } : {}),
     })
     .select('id')

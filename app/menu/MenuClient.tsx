@@ -34,19 +34,19 @@ const ORDER_STATUS_MESSAGES: Record<Language, Record<string, string>> = {
   en: {
     preparing: 'Your order is being prepared.',
     ready: 'Your order is ready!',
-    completed: 'Your order has been served. Enjoy!',
+    served: 'Your order has been served. Enjoy!',
     cancelled: 'Your order was cancelled. Please contact staff.',
   },
   fr: {
     preparing: 'Votre commande est en préparation.',
     ready: 'Votre commande est prête !',
-    completed: 'Votre commande a été servie. Bon appétit !',
+    served: 'Votre commande a été servie. Bon appétit !',
     cancelled: 'Votre commande a été annulée. Contactez le personnel.',
   },
   ar: {
     preparing: 'يتم تحضير طلبك.',
     ready: 'طلبك جاهز!',
-    completed: 'تم تقديم طلبك. بالهناء والشفاء!',
+    served: 'تم تقديم طلبك. بالهناء والشفاء!',
     cancelled: 'تم إلغاء طلبك. يرجى التواصل مع النادل.',
   },
 };

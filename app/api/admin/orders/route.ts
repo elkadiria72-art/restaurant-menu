@@ -4,7 +4,7 @@ import type { OrderRecord } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
 
-const ORDER_STATUSES = new Set(['pending', 'preparing', 'ready', 'completed', 'cancelled']);
+const ORDER_STATUSES = new Set(['new', 'preparing', 'ready', 'served', 'cancelled']);
 
 export async function GET() {
   if (!supabase) {
@@ -13,7 +13,7 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from('orders')
-    .select('id, table_id, table_number, items, total_price, status, notes, created_at')
+    .select('id, table_id, table_number, items, total_amount, status, notes, created_at')
     .order('created_at', { ascending: false })
     .limit(100);
 

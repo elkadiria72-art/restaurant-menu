@@ -46,7 +46,7 @@ export type OrderRecord = {
   table_id: number;
   table_number: number;
   items: OrderItem[];
-  total_price: number;
+  total_amount: number;
   status: string;
   notes?: string | null;
   created_at?: string | null;
