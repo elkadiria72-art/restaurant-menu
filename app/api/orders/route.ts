@@ -17,7 +17,6 @@ export async function POST(request: Request) {
     items?: OrderItemInput[];
     table_id?: number;
     table_number?: number;
-    customer_notes?: string;
     notes?: string;
   };
   try {
@@ -27,7 +26,7 @@ export async function POST(request: Request) {
   }
 
   const { qr_token, items } = body;
-  const customerNotes = sanitizeCustomerNotes(body.customer_notes ?? body.notes);
+  const notes = sanitizeCustomerNotes(body.notes);
 
   if (body.table_id != null || body.table_number != null) {
     return NextResponse.json({ error: 'Table must be identified by qr_token only' }, { status: 400 });
@@ -94,8 +93,9 @@ export async function POST(request: Request) {
       table_id: table.table_id,
       table_number: table.table_number,
       status: 'pending',
-      ...(customerNotes ? { customer_notes: customerNotes } : {}),
-    })    .select('id')
+      ...(notes ? { notes } : {}),
+    })
+    .select('id')
     .single();
 
   if (insertError) {

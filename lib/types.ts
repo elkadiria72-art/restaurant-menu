@@ -15,7 +15,7 @@ export type Category = {
 export type MenuItem = {
   id: number;
   name: string;
-  description: string | null;
+  description?: string | null;
   price: number;
   category_id?: number | null;
   category?: string | null;
@@ -48,6 +48,6 @@ export type OrderRecord = {
   items: OrderItem[];
   total_price: number;
   status: string;
-  customer_notes?: string | null;
+  notes?: string | null;
   created_at?: string | null;
 };

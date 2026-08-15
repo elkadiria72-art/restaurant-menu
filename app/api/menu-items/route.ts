@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { resolveMenuImageUrl } from '@/lib/menuImages';
 import { supabase } from '@/lib/supabase';
 import type { MenuItem } from '@/lib/types';
 
@@ -11,7 +12,7 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from('menu_items')
-    .select('id, name, description, price, category_id, category, image_url, is_available')
+    .select('id, name, price, category, image_url, is_available')
     .eq('is_available', true)
     .order('name', { ascending: true });
 
@@ -20,5 +21,11 @@ export async function GET() {
     return NextResponse.json({ error: 'Could not load menu items' }, { status: 500 });
   }
 
-  return NextResponse.json((data ?? []) as MenuItem[]);
+  const items = ((data ?? []) as MenuItem[]).map((item) => ({
+    ...item,
+    description: item.description ?? null,
+    image_url: resolveMenuImageUrl(item.image_url) ?? item.image_url,
+  }));
+
+  return NextResponse.json(items);
 }

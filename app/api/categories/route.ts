@@ -10,12 +10,8 @@ export async function GET() {
   }
 
   const [{ data: categories, error: catError }, { data: items, error: itemsError }] = await Promise.all([
-    supabase
-      .from('categories')
-      .select('id, name, sort_order, is_active')
-      .eq('is_active', true)
-      .order('sort_order', { ascending: true }),
-    supabase.from('menu_items').select('category_id, category').eq('is_available', true),
+    supabase.from('categories').select('id, name').order('name', { ascending: true }),
+    supabase.from('menu_items').select('category').eq('is_available', true),
   ]);
 
   if (catError) {
@@ -28,22 +24,15 @@ export async function GET() {
   const availableItems = items ?? [];
 
   if (categories?.length) {
-    const activeCategoryIds = new Set(
-      availableItems.map((row) => row.category_id).filter((id): id is number => id != null),
-    );
     const activeCategoryNames = new Set(
       availableItems.map((row) => row.category?.trim().toLowerCase()).filter(Boolean) as string[],
     );
 
-    const withItems = categories.filter((cat) => {
-      if (activeCategoryIds.has(cat.id)) return true;
-      return activeCategoryNames.has(cat.name.trim().toLowerCase());
-    });
+    const withItems = categories.filter((cat) => activeCategoryNames.has(cat.name.trim().toLowerCase()));
 
     return NextResponse.json(withItems as Category[]);
   }
 
-  // No rows in categories table — derive labels from available menu_items only (still from DB).
   const seen = new Set<string>();
   const derived: Category[] = [];
 
@@ -52,10 +41,8 @@ export async function GET() {
     if (!name || seen.has(name.toLowerCase())) return;
     seen.add(name.toLowerCase());
     derived.push({
-      id: row.category_id ?? -(index + 1),
+      id: -(index + 1),
       name,
-      sort_order: index,
-      is_active: true,
     });
   });
 

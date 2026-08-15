@@ -138,7 +138,7 @@ export default function AdminOrdersBoard({ initialOrders }: Props) {
         <div className="grid gap-4">
           {visibleOrders.map((order) => {
             const actions = NEXT_ACTIONS[order.status] ?? [];
-            const notes = order.customer_notes?.trim();
+            const notes = order.notes?.trim();
 
             return (
               <article

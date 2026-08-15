@@ -11,6 +11,7 @@ import type { CartItem, Category, Language, MenuItem, TableSession, WaiterReques
 import Cart from './components/Cart';
 import CategoryBar from './components/CategoryBar';
 import MenuHeader from './components/MenuHeader';
+import MenuItemImage from './components/MenuItemImage';
 import MobileCartBar from './components/MobileCartBar';
 import NotificationToast from './components/NotificationToast';
 
@@ -311,26 +312,28 @@ export default function MenuClient({ table }: Props) {
   }, [selectedCategory, visibleCategories]);
 
   const filteredItems = useMemo(() => {
-    let items = menuItems.slice();
+    const items = menuItems.slice();
+
+    if (searchQueryNormalized) {
+      return items.filter((item) => {
+        const translatedName = translateItemName(item);
+        const translatedDescription = translateItemDescription(item);
+        const translatedCategory = translateCategory(item.category || '');
+
+        return [translatedName, translatedDescription, translatedCategory, item.name, item.description ?? ''].some(
+          (value) => value && normalize(String(value)).includes(searchQueryNormalized),
+        );
+      });
+    }
 
     if (selectedCategory !== 'ALL') {
       const cat = visibleCategories.find((c) => String(c.id) === selectedCategory);
       if (cat) {
-        items = items.filter((item) => itemMatchesCategory(item, cat));
+        return items.filter((item) => itemMatchesCategory(item, cat));
       }
     }
 
-    if (!searchQueryNormalized) return items;
-
-    return items.filter((item) => {
-      const translatedName = translateItemName(item);
-      const translatedDescription = translateItemDescription(item);
-      const translatedCategory = translateCategory(item.category || '');
-
-      return [translatedName, translatedDescription, translatedCategory].some((value) =>
-        normalize(value).includes(searchQueryNormalized),
-      );
-    });
+    return items;
   }, [menuItems, selectedCategory, visibleCategories, searchQueryNormalized, language, translationsCache]);
 
   const groupedItems = useMemo(() => {
@@ -393,7 +396,7 @@ export default function MenuClient({ table }: Props) {
         body: JSON.stringify({
           qr_token: qrToken,
           items: cart.map((item) => ({ item_id: item.id, quantity: item.quantity })),
-          ...(orderNotes.trim() ? { customer_notes: orderNotes.trim() } : {}),
+          ...(orderNotes.trim() ? { notes: orderNotes.trim() } : {}),
         }),
       });
 
@@ -559,15 +562,7 @@ export default function MenuClient({ table }: Props) {
                               key={item.id}
                               className="group min-w-0 overflow-hidden rounded-[20px] border border-[#b08b4d]/30 bg-[linear-gradient(135deg,_#fffdf9_0%,_#f6ebdb_100%)] p-3 shadow-[0_18px_45px_-24px_rgba(94,62,26,0.5)] sm:rounded-[24px] sm:p-4"
                             >
-                              {item.image_url ? (
-                                <img
-                                  src={item.image_url}
-                                  alt={translatedName}
-                                  loading="lazy"
-                                  decoding="async"
-                                  className="mb-3 h-32 w-full rounded-[16px] object-cover sm:h-40 sm:rounded-[18px]"
-                                />
-                              ) : null}
+                              <MenuItemImage src={item.image_url} alt={translatedName} />
                               <div className="flex items-start justify-between gap-2">
                                 <div className="min-w-0 flex-1">
                                   <h3 className="line-clamp-2 font-semibold text-[#2f2417]">{translatedName}</h3>

@@ -10,7 +10,7 @@ const normalize = (value: string) =>
     .trim();
 
 export function itemMatchesCategory(item: MenuItem, category: Category): boolean {
-  if (item.category_id != null && item.category_id === category.id) return true;
+  if (item.category_id != null && category.id > 0 && item.category_id === category.id) return true;
   if (item.category && category.name && normalize(item.category) === normalize(category.name)) return true;
   return false;
 }
