@@ -168,7 +168,7 @@ export default function AdminOrdersBoard({ initialOrders }: Props) {
                       className="flex items-center justify-between rounded-xl border border-[#e9dfbf] bg-white px-3 py-2 text-sm"
                     >
                       <span className="font-medium text-[#2f2417]">
-                        {item.quantity}× {item.name}
+                        {item.quantity}× {typeof item.name === 'string' ? item.name : ''}
                       </span>
                       <span className="text-[#6f5b3a]">{(item.unit_price * item.quantity).toFixed(2)} DH</span>
                     </li>

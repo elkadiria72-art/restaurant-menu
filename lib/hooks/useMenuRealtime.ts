@@ -35,6 +35,9 @@ export function useMenuRealtime(handlers: RealtimeHandlers) {
     const refreshMenu = debounce(() => handlersRef.current.onMenuItemsChange(), DEBOUNCE_MS);
     const refreshCategories = debounce(() => handlersRef.current.onCategoriesChange(), DEBOUNCE_MS);
 
+    // Separate channels per logical feature: a subscription the database cannot
+    // serve (e.g. a table missing from the realtime publication) must not stop
+    // delivery on the other channel.
     const channel = client
       .channel(`customer-menu-${tableId}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'menu_items' }, refreshMenu)
@@ -57,6 +60,15 @@ export function useMenuRealtime(handlers: RealtimeHandlers) {
           }
         },
       )
+      .subscribe((status) => {
+        if (status === 'CHANNEL_ERROR') {
+          refreshMenu();
+          refreshCategories();
+        }
+      });
+
+    const callsChannel = client
+      .channel(`customer-menu-${tableId}-calls`)
       .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'waiter_calls', filter: `table_id=eq.${tableId}` },
@@ -67,15 +79,11 @@ export function useMenuRealtime(handlers: RealtimeHandlers) {
           }
         },
       )
-      .subscribe((status) => {
-        if (status === 'CHANNEL_ERROR') {
-          refreshMenu();
-          refreshCategories();
-        }
-      });
+      .subscribe();
 
     return () => {
       client.removeChannel(channel);
+      client.removeChannel(callsChannel);
     };
   }, [handlers.tableId]);
 }

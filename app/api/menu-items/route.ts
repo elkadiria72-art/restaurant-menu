@@ -13,7 +13,6 @@ export async function GET() {
   const { data, error } = await supabase
     .from('menu_items')
     .select('id, name, price, category, image_url, is_available')
-    .eq('is_available', true)
     .order('name', { ascending: true });
 
   if (error) {

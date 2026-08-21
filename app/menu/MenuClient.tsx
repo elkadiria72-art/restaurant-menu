@@ -206,7 +206,9 @@ export default function MenuClient({ table }: Props) {
 
       setCart((prev) => {
         if (!prev.length) return prev;
-        const availableIds = new Set(data.map((item) => item.id));
+        const availableIds = new Set(
+          data.filter((item) => item.is_available !== false).map((item) => item.id),
+        );
         return prev.filter((entry) => availableIds.has(entry.id));
       });
     } catch {
@@ -560,17 +562,23 @@ export default function MenuClient({ table }: Props) {
                         {items.map((item) => {
                           const translatedName = translateItemName(item);
                           const translatedDescription = translateItemDescription(item);
+                          const unavailable = item.is_available === false;
 
                           return (
                             <article
                               key={item.id}
-                              className="group min-w-0 overflow-hidden rounded-[20px] border border-[#b08b4d]/30 bg-[linear-gradient(135deg,_#fffdf9_0%,_#f6ebdb_100%)] p-3 shadow-[0_18px_45px_-24px_rgba(94,62,26,0.5)] sm:rounded-[24px] sm:p-4"
+                              className={`group min-w-0 overflow-hidden rounded-[20px] border border-[#b08b4d]/30 bg-[linear-gradient(135deg,_#fffdf9_0%,_#f6ebdb_100%)] p-3 shadow-[0_18px_45px_-24px_rgba(94,62,26,0.5)] sm:rounded-[24px] sm:p-4 ${
+                                unavailable ? 'opacity-55 saturate-50' : ''
+                              }`}
                             >
                               <MenuItemImage src={item.image_url} alt={translatedName} />
                               <div className="flex items-start justify-between gap-2">
                                 <div className="min-w-0 flex-1">
                                   <h3 className="line-clamp-2 font-semibold text-[#2f2417]">{translatedName}</h3>
                                   <p className="mt-1 line-clamp-2 text-sm leading-6 text-[#6f5b3a]">{translatedDescription}</p>
+                                  {unavailable && (
+                                    <p className="mt-1 text-xs font-semibold text-[#a33a3a]">{t.unavailable}</p>
+                                  )}
                                 </div>
                                 <div className="shrink-0 rounded-full bg-[#5d6b4d] px-2.5 py-1 text-xs font-semibold text-[#f8f2e6] sm:px-3 sm:text-sm">
                                   {item.price.toFixed(2)} DH
@@ -578,7 +586,7 @@ export default function MenuClient({ table }: Props) {
                               </div>
                               <button
                                 type="button"
-                                disabled={tableBlocked}
+                                disabled={tableBlocked || unavailable}
                                 onClick={() => addToCart(item)}
                                 className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-[#2f2417] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#4a3723] disabled:cursor-not-allowed disabled:opacity-50 sm:mt-4 sm:min-h-12 sm:py-3"
                               >
