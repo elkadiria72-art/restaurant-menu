@@ -487,7 +487,9 @@ export default function MenuClient({ table }: Props) {
 
   return (
     <main
-      className={`min-h-[100dvh] w-full max-w-[100vw] overflow-x-hidden bg-[linear-gradient(135deg,_#f4ebdc_0%,_#fffaf2_42%,_#efe0c0_100%)] ${isRTL ? 'rtl' : 'ltr'} ${cartItemsCount > 0 && !cartOpen ? 'mobile-page-bottom' : 'pb-4'} lg:pb-0`}
+      className={`min-h-[100dvh] w-full max-w-[100vw] overflow-x-hidden ${isRTL ? 'rtl' : 'ltr'} ${
+        cartItemsCount > 0 && !cartOpen ? 'mobile-page-bottom' : 'pb-4'
+      } lg:pb-0`}
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       <CategoryBar
@@ -507,11 +509,9 @@ export default function MenuClient({ table }: Props) {
         isRTL={isRTL}
       />
 
-      <div className="mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 p-3 sm:gap-6 sm:p-6 lg:grid lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-8 lg:p-8">
-        <section className="relative min-w-0 overflow-hidden rounded-[24px] border border-[#b08b4d]/30 bg-[#fcf7ef]/95 p-3 shadow-[0_30px_90px_-35px_rgba(101,70,27,0.45)] sm:rounded-[34px] sm:p-5">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(176,139,77,0.16),_transparent_36%),linear-gradient(135deg,_rgba(93,107,77,0.06),_transparent_45%)]" />
-
-          <div className="relative space-y-4 sm:space-y-5">
+      <div className="mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 p-3 sm:gap-6 sm:p-5 lg:grid lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-8 lg:p-8">
+        <section className="min-w-0">
+          <div className="space-y-5 sm:space-y-6">
             <MenuHeader
               language={language}
               tableNumber={table.table_number}
@@ -527,34 +527,28 @@ export default function MenuClient({ table }: Props) {
               isRTL={isRTL}
             />
 
-            <div className="rounded-[20px] border border-[#b08b4d]/20 bg-[#fdf8ef]/70 p-3 text-sm text-[#6f5b3a] sm:rounded-[24px] sm:p-4">
-              <p className="leading-6">{t.subtitle}</p>
-            </div>
+            <p className="mx-auto max-w-md text-center text-[13px] leading-6 text-[#5A665E]">{t.subtitle}</p>
 
             {tableBlocked ? (
-              <div className="rounded-[20px] border border-[#d6b47b]/50 bg-[#f8edd6] p-3 text-sm text-[#8a5f1d]">{t.tableUnavailable}</div>
+              <div className="rounded-xl border border-[#EFE0C8] bg-[#FBF4E4] p-3 text-center text-sm text-[#8A6A1F]">{t.tableUnavailable}</div>
             ) : null}
 
             {loading ? (
-              <div className="rounded-[24px] border border-dashed border-[#b08b4d]/40 bg-[#f7efe1] p-8 text-center text-sm text-[#7a6140]">
-                {t.loading}
-              </div>
+              <div className="animate-pulse py-16 text-center text-sm text-[#87918A]">{t.loading}</div>
             ) : (
-              <div className="space-y-5 sm:space-y-6">
+              <div className="space-y-6 sm:space-y-7">
                 {message && !cart.length && !filteredItems.length ? (
-                  <div className="rounded-[20px] border border-[#d6b47b]/50 bg-[#f8edd6] p-3 text-sm text-[#8a5f1d]">{message}</div>
+                  <div className="rounded-xl border border-[#D3E7D9] bg-[#E9F4EC] p-3 text-center text-sm text-[#1F6B3B]">{message}</div>
                 ) : null}
 
                 {!filteredItems.length ? (
-                  <div className="rounded-[24px] border border-dashed border-[#b08b4d]/35 bg-[#f8efe2] p-8 text-center text-sm text-[#7a6140]">
-                    {t.noResults}
-                  </div>
+                  <div className="py-14 text-center text-sm text-[#87918A]">{t.noResults}</div>
                 ) : (
                   Object.entries(groupedItems).map(([category, items]) => (
                     <div key={category} className="space-y-3">
-                      <div className="flex min-w-0 items-center justify-between gap-2 rounded-full border border-[#b08b4d]/25 bg-[#f5ebda] px-3 py-2.5 sm:px-4">
-                        <h2 className="min-w-0 truncate text-base font-semibold text-[#2f2417] sm:text-lg">{category}</h2>
-                        <span className="shrink-0 text-xs text-[#796447] sm:text-sm">
+                      <div className="flex items-baseline justify-between gap-3 border-b border-[#EAE4D8] pb-2">
+                        <h2 className="font-display min-w-0 truncate text-lg font-bold text-[#26312B]">{category}</h2>
+                        <span className="shrink-0 text-xs text-[#87918A]">
                           {items.length} {t.items}
                         </span>
                       </div>
@@ -567,32 +561,40 @@ export default function MenuClient({ table }: Props) {
                           return (
                             <article
                               key={item.id}
-                              className={`group min-w-0 overflow-hidden rounded-[20px] border border-[#b08b4d]/30 bg-[linear-gradient(135deg,_#fffdf9_0%,_#f6ebdb_100%)] p-3 shadow-[0_18px_45px_-24px_rgba(94,62,26,0.5)] sm:rounded-[24px] sm:p-4 ${
-                                unavailable ? 'opacity-55 saturate-50' : ''
+                              className={`group flex min-w-0 flex-col overflow-hidden rounded-[22px] border border-[#EAE4D8] bg-white shadow-[0_12px_32px_-22px_rgba(38,49,43,0.25)] transition hover:shadow-[0_18px_44px_-22px_rgba(38,49,43,0.3)] sm:rounded-[26px] ${
+                                unavailable ? 'opacity-60' : ''
                               }`}
                             >
-                              <MenuItemImage src={item.image_url} alt={translatedName} />
-                              <div className="flex items-start justify-between gap-2">
-                                <div className="min-w-0 flex-1">
-                                  <h3 className="line-clamp-2 font-semibold text-[#2f2417]">{translatedName}</h3>
-                                  <p className="mt-1 line-clamp-2 text-sm leading-6 text-[#6f5b3a]">{translatedDescription}</p>
-                                  {unavailable && (
-                                    <p className="mt-1 text-xs font-semibold text-[#a33a3a]">{t.unavailable}</p>
-                                  )}
-                                </div>
-                                <div className="shrink-0 rounded-full bg-[#5d6b4d] px-2.5 py-1 text-xs font-semibold text-[#f8f2e6] sm:px-3 sm:text-sm">
-                                  {item.price.toFixed(2)} DH
+                              <div
+                                className={`relative aspect-[4/3] w-full shrink-0 overflow-hidden bg-[#E9F4EC] ${
+                                  unavailable ? 'grayscale-[45%]' : ''
+                                }`}
+                              >
+                                <MenuItemImage src={item.image_url} alt={translatedName} />
+                              </div>
+                              <div className="flex min-w-0 flex-1 flex-col p-3.5 sm:p-4">
+                                <h3 className="min-w-0 line-clamp-1 text-[16px] font-bold leading-snug text-[#26312B]">
+                                  {translatedName}
+                                </h3>
+                                <p className="mt-1 line-clamp-2 min-h-[2.5rem] text-[13px] leading-5 text-[#5A665E]">{translatedDescription}</p>
+                                {unavailable && (
+                                  <p className="mt-1.5 text-xs font-bold text-[#B0483F]">{t.unavailable}</p>
+                                )}
+                                <div className="mt-auto flex items-center justify-between gap-2.5 pt-3.5">
+                                  <span className="shrink-0 text-[16px] font-bold text-[#1F6B3B]">
+                                    {item.price.toFixed(2)} DH
+                                  </span>
+                                  <button
+                                    type="button"
+                                    disabled={tableBlocked || unavailable}
+                                    onClick={() => addToCart(item)}
+                                    className="flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-full bg-[#2F8F4E] px-4 py-2 text-sm font-bold text-white shadow-[0_6px_14px_rgba(47,143,78,0.24)] transition hover:bg-[#25763E] active:scale-[0.985] disabled:cursor-not-allowed disabled:opacity-45 disabled:shadow-none sm:min-h-11"
+                                  >
+                                    <Plus size={15} />
+                                    {t.addToCart}
+                                  </button>
                                 </div>
                               </div>
-                              <button
-                                type="button"
-                                disabled={tableBlocked || unavailable}
-                                onClick={() => addToCart(item)}
-                                className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-[#2f2417] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#4a3723] disabled:cursor-not-allowed disabled:opacity-50 sm:mt-4 sm:min-h-12 sm:py-3"
-                              >
-                                <Plus size={16} />
-                                {t.addToCart}
-                              </button>
                             </article>
                           );
                         })}
@@ -605,7 +607,7 @@ export default function MenuClient({ table }: Props) {
           </div>
         </section>
 
-        <aside className="hidden w-full max-w-xl lg:block lg:sticky lg:top-24 lg:h-fit">
+        <aside className="hidden w-full max-w-xl lg:block lg:sticky lg:top-20 lg:h-fit">
           <Cart
             cart={cart}
             language={language}
@@ -631,28 +633,28 @@ export default function MenuClient({ table }: Props) {
       />
 
       {waiterModalOpen ? (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#1f140a]/70 px-3 pb-3 safe-bottom sm:items-center sm:px-4 sm:pb-6">
-          <div className="w-full max-w-md rounded-[28px] border border-[#b08b4d]/30 bg-[#fcf7ef] p-5 shadow-[0_30px_90px_-30px_rgba(25,17,10,0.8)]">
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#26312B]/45 px-3 pb-3 safe-bottom sm:items-center sm:px-4 sm:pb-6">
+          <div className="w-full max-w-md rounded-2xl border border-[#EAE4D8] bg-white p-5 shadow-[0_16px_48px_rgba(38,49,43,0.2)] sm:p-6">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-lg font-semibold text-[#2f2417]">{t.callWaiter}</p>
-                <p className="mt-1 text-sm text-[#7a6140]">{t.chooseRequest}</p>
+                <p className="font-display text-lg font-bold text-[#26312B]">{t.callWaiter}</p>
+                <p className="mt-1 text-sm text-[#5A665E]">{t.chooseRequest}</p>
               </div>
               <button
                 type="button"
                 onClick={() => setWaiterModalOpen(false)}
-                className="touch-target shrink-0 rounded-full border border-[#b08b4d]/20 bg-white p-2 text-[#5b4325]"
+                className="touch-target shrink-0 rounded-full border border-[#EAE4D8] bg-white p-2 text-[#87918A] transition hover:bg-[#E9F4EC] hover:text-[#26312B]"
               >
                 <X size={16} />
               </button>
             </div>
 
-            <div className="mt-5 space-y-3">
+            <div className="mt-5 space-y-2.5">
               <button
                 type="button"
                 onClick={() => handleWaiterCall('bill')}
                 disabled={submittingWaiterCall}
-                className="touch-target flex w-full items-center justify-center rounded-full bg-[#2f2417] px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"
+                className="touch-target flex min-h-12 w-full items-center justify-center rounded-xl bg-[#2F8F4E] px-4 py-3 text-sm font-bold text-white shadow-[0_6px_16px_rgba(47,143,78,0.24)] transition hover:bg-[#25763E] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none"
               >
                 {submittingWaiterCall ? '...' : t.requestBill}
               </button>
@@ -660,7 +662,7 @@ export default function MenuClient({ table }: Props) {
                 type="button"
                 onClick={() => handleWaiterCall('help')}
                 disabled={submittingWaiterCall}
-                className="touch-target flex w-full items-center justify-center rounded-full border border-[#b08b4d]/30 bg-[#fffaf3] px-4 py-3 text-sm font-semibold text-[#5b4325] disabled:cursor-not-allowed disabled:opacity-70"
+                className="touch-target flex min-h-12 w-full items-center justify-center rounded-xl border border-[#D3E7D9] bg-[#E9F4EC] px-4 py-3 text-sm font-bold text-[#1F6B3B] transition hover:border-[#2F8F4E]/45 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {submittingWaiterCall ? '...' : t.requestHelp}
               </button>
@@ -674,25 +676,25 @@ export default function MenuClient({ table }: Props) {
           <button
             type="button"
             aria-label={t.cancel}
-            className="absolute inset-0 bg-[#1f140a]/70"
+            className="absolute inset-0 bg-[#26312B]/45"
             onClick={() => setCartOpen(false)}
           />
           <div
-            className="absolute inset-x-0 bottom-0 flex max-h-[88dvh] flex-col rounded-t-[28px] border border-[#b08b4d]/30 bg-[linear-gradient(135deg,_#2f2417_0%,_#17110d_100%)] shadow-[0_30px_90px_-30px_rgba(25,17,10,0.8)] safe-bottom"
+            className="absolute inset-x-0 bottom-0 flex max-h-[88dvh] flex-col rounded-t-2xl border-t border-[#EAE4D8] bg-white shadow-[0_-12px_40px_rgba(38,49,43,0.2)] safe-bottom"
             role="dialog"
             aria-modal="true"
           >
-            <div className="flex shrink-0 items-center justify-between border-b border-white/10 px-4 py-3">
+            <div className="flex shrink-0 items-center justify-between border-b border-[#EAE4D8] px-4 py-3">
               <div className="min-w-0">
-                <p className="truncate text-base font-semibold text-white">{t.title}</p>
-                <p className="text-sm text-stone-300">
+                <p className="truncate text-base font-bold text-[#26312B]">{t.title}</p>
+                <p className="text-sm text-[#5A665E]">
                   {cartItemsCount} {t.items}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setCartOpen(false)}
-                className="touch-target shrink-0 rounded-full border border-white/15 bg-white/10 p-2 text-white"
+                className="touch-target shrink-0 rounded-full border border-[#EAE4D8] bg-white p-2 text-[#87918A] transition hover:bg-[#E9F4EC] hover:text-[#26312B]"
               >
                 <X size={16} />
               </button>

@@ -16,10 +16,10 @@ export default function MenuItemImage({ src, alt }: Props) {
   if (!resolved || failed) {
     return (
       <div
-        className="mb-3 flex h-32 w-full items-center justify-center rounded-[16px] border border-dashed border-[#b08b4d]/25 bg-[#f5ebda]/80 sm:h-40 sm:rounded-[18px]"
+        className="flex h-full w-full items-center justify-center bg-[#EFE6D8]"
         aria-hidden="true"
       >
-        <UtensilsCrossed className="text-[#b08b4d]/45" size={36} strokeWidth={1.5} />
+        <UtensilsCrossed className="text-[#C89F5C]" size={26} strokeWidth={1.5} />
       </div>
     );
   }
@@ -31,7 +31,7 @@ export default function MenuItemImage({ src, alt }: Props) {
       loading="lazy"
       decoding="async"
       onError={() => setFailed(true)}
-      className="mb-3 h-32 w-full rounded-[16px] object-cover sm:h-40 sm:rounded-[18px]"
+      className="h-full w-full object-cover"
     />
   );
 }

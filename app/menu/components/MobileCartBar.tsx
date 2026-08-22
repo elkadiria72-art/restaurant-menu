@@ -25,12 +25,12 @@ export default function MobileCartBar({ itemCount, total, onOpen, labels, isRTL,
       <button
         type="button"
         onClick={onOpen}
-        className="pointer-events-auto flex w-full touch-target items-center justify-between gap-3 rounded-full border border-[#b08b4d]/35 bg-[#2f2417] px-4 py-3 text-white shadow-[0_20px_60px_-18px_rgba(25,17,10,0.85)] active:scale-[0.99] transition-transform"
+        className="pointer-events-auto flex w-full touch-target items-center justify-between gap-3 rounded-2xl bg-[#8B5E34] px-4 py-3 text-white shadow-[0_10px_28px_rgba(41,37,33,0.28)] transition-transform active:scale-[0.99]"
       >
         <div className="flex min-w-0 items-center gap-3">
-          <div className="relative shrink-0 rounded-full bg-white/10 p-2">
+          <div className="relative shrink-0 rounded-full bg-white/15 p-2">
             <ShoppingBag size={16} />
-            <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#C9A227] px-1 text-[10px] font-bold text-[#22170e]">
+            <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#C89F5C] px-1 text-[10px] font-bold text-[#292521]">
               {itemCount}
             </span>
           </div>
@@ -38,7 +38,7 @@ export default function MobileCartBar({ itemCount, total, onOpen, labels, isRTL,
             <p className="truncate text-sm font-semibold">
               {itemCount} {labels.items}
             </p>
-            <p className="text-xs text-stone-300">{total.toFixed(2)} DH</p>
+            <p className="text-xs text-white/75">{total.toFixed(2)} DH</p>
           </div>
         </div>
         <span className="flex shrink-0 items-center gap-1 text-sm font-medium">
