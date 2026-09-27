@@ -9,8 +9,11 @@ export async function GET() {
     return NextResponse.json([], { status: 200 });
   }
 
+  // select(*) keeps the route working before and after the optional
+  // name_fr/name_en translation migration: rows simply carry whichever
+  // translation columns exist.
   const [{ data: categories, error: catError }, { data: items, error: itemsError }] = await Promise.all([
-    supabase.from('categories').select('id, name').order('name', { ascending: true }),
+    supabase.from('categories').select('*').order('name', { ascending: true }),
     supabase.from('menu_items').select('category').eq('is_available', true),
   ]);
 

@@ -172,7 +172,20 @@ export default function MenuClient({ table }: Props) {
     [translationsCache],
   );
 
-  const translateCategory = (name: string) => translateText(name, language);
+  // Prefer translations stored by Admin on the category row (name_fr/name_en);
+  // fall back to the cached machine-translation pipeline when absent.
+  const dbCategoryTranslation = useCallback(
+    (name: string, target: Language): string | null => {
+      if (target === 'ar') return null;
+      const cat = categories.find((c) => c.name === name);
+      if (!cat) return null;
+      const value = target === 'fr' ? cat.name_fr : cat.name_en;
+      return value && value.trim() ? value.trim() : null;
+    },
+    [categories],
+  );
+
+  const translateCategory = (name: string) => dbCategoryTranslation(name, language) ?? translateText(name, language);
   const translateItemName = (item: MenuItem) => translateText(item.name, language);
   const translateItemDescription = (item: MenuItem) => translateText(item.description || item.name, language);
 
@@ -268,6 +281,11 @@ export default function MenuClient({ table }: Props) {
     const toTranslate = new Set<string>();
 
     categories.forEach((cat) => {
+      // DB translations (name_fr/name_en) take priority — no machine call needed.
+      if (language !== 'ar') {
+        const stored = language === 'fr' ? cat.name_fr : cat.name_en;
+        if (stored && stored.trim()) return;
+      }
       const cacheKey = `${cat.name}:::${language}`;
       if (!translationsCache[cacheKey]) toTranslate.add(cat.name);
     });

@@ -8,6 +8,8 @@ export type TableSession = {
 export type Category = {
   id: number;
   name: string;
+  name_fr?: string | null;
+  name_en?: string | null;
   sort_order?: number | null;
   is_active?: boolean | null;
 };

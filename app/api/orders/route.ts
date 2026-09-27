@@ -103,6 +103,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Could not place order' }, { status: 500 });
   }
 
+  // Mark the table occupied the moment a customer orders from it, so the Admin
+  // floor map reflects real activity through its existing realtime subscription.
+  // Best-effort: a failed table update must not fail an already-placed order.
+  const { error: tableStatusError } = await supabase
+    .from('tables')
+    .update({ status: 'occupied' })
+    .eq('id', table.table_id);
+  if (tableStatusError) {
+    console.error('tables occupied update error', tableStatusError);
+  }
+
   return NextResponse.json({
     success: true,
     order_id: order?.id,
